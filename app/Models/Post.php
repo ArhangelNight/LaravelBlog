@@ -6,14 +6,29 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 
-class Category extends Model
+class Post extends Model
 {
     use HasFactory;
     use Sluggable;
 
-    public function posts()
+    public function category()
     {
-        return $this->hasMany(Post::class);
+        return $this->hasOne(Category::class);
+    }
+
+    public function author()
+    {
+        return $this->hasOne(User::class);
+    }
+
+    public function tags()
+    {
+        return $this->newBelongsToMany(
+            Tag::class,
+            'post_tags',
+            'post_id',
+            'tag_id'
+        );
     }
 
     public function sluggable(): array
@@ -24,5 +39,6 @@ class Category extends Model
             ]
         ];
     }
+
 
 }
