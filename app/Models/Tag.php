@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Support\Str;
 
 class Tag extends Model
 {
     use HasFactory;
-    use Sluggable;
+
+    protected $fillable = ['title','slug'];
 
     public function posts()
     {
@@ -21,12 +22,9 @@ class Tag extends Model
         );
     }
 
-    public function sluggable(): array
+    public function sluggable()
     {
-        return [
-            'slug' => [
-                'source' => 'title'
-            ]
-        ];
+        $this->slug = Str::slug($this->title);
+        $this->save();
     }
 }
