@@ -34,7 +34,7 @@
 
                         <!-- /.box-body -->
                         <div class="box-footer">
-                            <button class="btn btn-default">Назад</button>
+                            <a href="{{route('tags.index')}}" class="btn btn-default">Назад</a>
                             <button class="btn btn-warning pull-right" type="submit">Изменить</button>
                         </div>
                         <!-- /.box-footer-->

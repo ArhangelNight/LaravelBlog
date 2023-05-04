@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UsersController extends Controller
 {
@@ -21,17 +22,17 @@ class UsersController extends Controller
         return view('admin.users.create');
     }
 
-
-
     public function store(Request $request)
     {
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users',
             'password' => 'required',
             'avatar' => 'nullable|image'
         ]);
-        $tag = User::create($request->all());
+        $user = User::add($request->all());
+        $user->generatePassword($request->get('password'));
+        $user->uploadAvatar($request->file('avatar'));
         return redirect()->route('users.index');
     }
 
@@ -45,16 +46,27 @@ class UsersController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, ['title'=>'required']);
         $user = User::find($id);
+        $this->validate($request, [
+            'name'=>'required',
+            'email'=>[
+                'required',
+                'email',
+                Rule::unique('users')->ignore($user->id)],
+            'avatar'=>'nullable|image',
+        ]);
+
         $user->update($request->all());
+        $user->generatePassword($request->get('password'));
+        $user->uploadAvatar($request->file('avatar'));
         return redirect()->route('users.index');
     }
 
 
     public function destroy($id)
     {
-        User::find($id)->delete();
+        $user = User::find($id);
+        $user->remove();
         return redirect()->route('users.index');
     }
 }

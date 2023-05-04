@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -20,7 +21,6 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
     ];
 
 
@@ -48,7 +48,6 @@ class User extends Authenticatable
     {
         $user = new static();
         $user->fill($fields);
-        $user->password = bcrypt($fields['password']);
         $user->save();
 
         return $user;
@@ -57,32 +56,48 @@ class User extends Authenticatable
     public function edit($fields)
     {
         $this->fill($fields);
-        $this->password = bcrypt($fields['password']);
+
         $this->save();
+    }
+
+    public function generatePassword($password)
+    {
+        if ($password != null){
+            $this->password = bcrypt($password);
+            $this->save();
+        }
     }
 
     public function remove()
     {
+        $this->removeAvatar();
         $this->delete();
     }
 
     public function uploadAvatar($image)
     {
         if ($image == null) {return;}
+        $this->removeAvatar();
 
-        Storage::delete('uploads/' . $this->image);
-        $filename = str_random(10) . '.' . $image->extension();
-        $image->saveAs('uploads', $filename);
-        $this->image = $filename;
+        $filepath = Storage::put('public/avatar', $image);
+        $filename = Str::after($filepath, 'public/');
+        $this->avatar = $filename;
         $this->save();
+    }
+
+    public function removeAvatar()
+    {
+        if($this->avatar !=null){
+            Storage::delete('public/' . $this->avatar);
+        }
     }
 
     public function getImage()
     {
-        if ($this->image == null){
+        if ($this->avatar == null){
             return '/img/no-user-image.png';
         }
-        return '/uploads/' . $this->image;
+        return asset('storage/'.$this->avatar);
     }
 
     public function makeAdmin()
