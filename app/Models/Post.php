@@ -14,7 +14,7 @@ class Post extends Model
     const IS_DRAFT = 0;
     const IS_PUBLIC = 1;
 
-    protected $fillable = ['title','content'];
+    protected $fillable = ['title','content', 'date'];
 
     public function category()
     {
@@ -60,17 +60,26 @@ class Post extends Model
 
     public function remove()
     {
-        Storage::delete('uploads/' . $this->image);
+        $this->removeImage();
         $this->delete();
+    }
+
+    public function removeImage()
+    {
+        if ($this->image != null){
+            Storage::delete('public/' . $this->image);
+        }
     }
 
     public function uploadImage($image)
     {
         if ($image == null) {return;}
+        $this->removeImage();
 
-        Storage::delete('uploads/' . $this->image);
-        $filename = str_random(10) . '.' . $image->extension();
-        $image->saveAs('uploads', $filename);
+        //$filename = str_random(10) . '.' . $image->extension();
+        //$image->storeAs('uploads', $filename);
+        $filename = Storage::put('public/images', $image);
+        $filename = Str::after($filename, 'public/');
         $this->image = $filename;
         $this->save();
     }
@@ -80,7 +89,7 @@ class Post extends Model
         if ($this->image == null){
             return '/img/no-image.png';
         }
-        return '/uploads/' . $this->image;
+        return asset('storage/' . $this->image);
     }
 
     public function setCategory($id)
@@ -134,7 +143,7 @@ class Post extends Model
         if ($value == null){
             return $this->setStandart();
         }
-        return $this->ssetFeatured();
+        return $this->setFeatured();
 
     }
 
