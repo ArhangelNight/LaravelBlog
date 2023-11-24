@@ -37,7 +37,7 @@
                         </div>
                         <div class="form-group">
                             <label>Категория</label>
-                            <select class="form-control select2" style="width: 100%;">
+                            <select class="form-select select2" style="width: 100%;" name="category_id">
                                 <option selected disabled >Выберите категорию</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->title }}</option>
@@ -46,7 +46,7 @@
                         </div>
                         <div class="form-group">
                             <label>Теги</label>
-                            <select class="form-control select2" multiple="multiple" data-placeholder="Выберите теги" style="width: 100%;">
+                            <select class="form-select select2" name="tags[]" multiple="multiple" data-placeholder="Выберите теги" style="width: 100%;">
                                 @foreach($tags as $key => $tag)
                                     <option value="{{ $key }}">{{ $tag }}</option>
                                 @endforeach
@@ -67,13 +67,13 @@
 
                         <!-- checkbox -->
                         <div class="form-group">
-                            <input type="checkbox" class="form-check-input" id="exampleCheck1" name="is_featured">
+                            <input type="checkbox" class="form-check-input" id="exampleCheck1" value="1" name="is_featured">
                             <label class="form-check-label" for="exampleCheck1">Рекомендовать</label>
                         </div>
 
                         <!-- checkbox -->
                         <div class="form-group">
-                            <input type="checkbox" class="form-check-input" id="exampleCheck1" name="status">
+                            <input type="checkbox" class="form-check-input" id="exampleCheck1" name="status" value="1">
                             <label class="form-check-label" for="exampleCheck1">Черновик</label>
                         </div>
                     </div>

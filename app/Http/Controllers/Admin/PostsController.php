@@ -48,7 +48,9 @@ class PostsController extends Controller
             'date'=>'required',
             'image'=>'nullable|image'
         ]);
+
         $post = Post::add($request->all());
+        $post->sluggable();
         $post->uploadImage($request->file('image'));
         $post->setCategory($request->get('category_id'));
         $post->setTags($request->get('tags'));
@@ -73,11 +75,18 @@ class PostsController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function edit($id)
     {
-        //
+        $post = Post::find($id);
+        $tags = Tag::query()->pluck('title', 'id');
+        $categories = Category::all();
+        return view('admin.posts.edit', compact(
+            'categories',
+            'tags',
+        'post'
+        ));
     }
 
     /**

@@ -14,26 +14,35 @@ class Post extends Model
     const IS_DRAFT = 0;
     const IS_PUBLIC = 1;
 
-    protected $fillable = ['title','content', 'date'];
+    protected $fillable = [
+        'title',
+        'content',
+        'date',
+        'slug',
+        'category_id',
+        'user_id',
+        'status',
+        'is_featured',
+        'views'];
 
     public function category()
     {
-        return $this->hasOne(Category::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function author()
     {
-        return $this->hasOne(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function tags()
     {
-        return $this->newBelongsToMany(
+        return $this->belongsToMany(
             Tag::class,
             'post_tags',
             'post_id',
             'tag_id'
-        );
+        )->withTimestamps();
     }
 
     public function sluggable()
@@ -145,6 +154,22 @@ class Post extends Model
         }
         return $this->setFeatured();
 
+    }
+
+    public function getCategoryTitle()
+    {
+        if ($this->category != null){
+            return $this->category->title;
+        }
+        return 'Нет категории';
+    }
+
+    public function getTagsTitles()
+    {
+        if (!$this->tags->isEmpty()){
+            return implode(', ', $this->tags->pluck('title')->all());
+        }
+        return 'Нет тегов';
     }
 
 
